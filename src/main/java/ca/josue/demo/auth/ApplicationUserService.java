@@ -1,6 +1,7 @@
 package ca.josue.demo.auth;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,10 +13,14 @@ import org.springframework.stereotype.Service;
  * @since 2022-03-14
  */
 @Service
-@RequiredArgsConstructor
 public class ApplicationUserService implements UserDetailsService {
 
     private final ApplicationUserDao applicationUserDao;
+
+    @Autowired
+    public ApplicationUserService(@Qualifier("fake") ApplicationUserDao applicationUserDao) {
+        this.applicationUserDao = applicationUserDao;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

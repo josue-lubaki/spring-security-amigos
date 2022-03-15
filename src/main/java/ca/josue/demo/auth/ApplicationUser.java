@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Josue Lubaki
@@ -15,9 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ApplicationUser implements UserDetails {
 
-    private final List<GrantedAuthority> grantedAuthority;
     private final String username;
     private final String password;
+    private final Set<? extends GrantedAuthority> grantedAuthority;
     private final boolean isAccountNonExpired;
     private final boolean isAccountNonLocked;
     private final boolean isCredentialsNonExpired;
