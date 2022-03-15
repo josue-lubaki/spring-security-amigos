@@ -2,6 +2,7 @@ package ca.josue.demo.auth;
 
 import ca.josue.demo.security.ApplicationUserRole;
 import com.google.common.collect.Lists;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -15,14 +16,15 @@ import java.util.Optional;
  * @since 2022-03-14
  */
 @Repository("fake")
+@RequiredArgsConstructor
 public class FakeApplicationUserDaoService implements ApplicationUserDao {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public FakeApplicationUserDaoService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+//    @Autowired
+//    public FakeApplicationUserDaoService(PasswordEncoder passwordEncoder) {
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
     @Override
     public Optional<ApplicationUser> applicationUserByUsername(String username) {

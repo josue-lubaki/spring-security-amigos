@@ -1,6 +1,7 @@
 package ca.josue.demo.security;
 
 import ca.josue.demo.auth.ApplicationUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +19,18 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final String REMEMBER_ME = "remember-me";
     private final PasswordEncoder passwordEncoder;
     private final ApplicationUserService applicationUserService;
 
-    @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService) {
-        this.passwordEncoder = passwordEncoder;
-        this.applicationUserService = applicationUserService;
-    }
+//    @Autowired
+//    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService) {
+//        this.passwordEncoder = passwordEncoder;
+//        this.applicationUserService = applicationUserService;
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -35,7 +38,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-                .antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
+                .antMatchers("/api/**").hasAnyRole(
+                        ApplicationUserRole.STUDENT.name(),
+                        ApplicationUserRole.ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -48,17 +53,17 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe()
                     .userDetailsService(applicationUserService)
-                    .key("remember-me")
+                    .key(REMEMBER_ME)
                     .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
                     .key("somethingverysecured")
-                    .rememberMeParameter("remember-me")
+                    .rememberMeParameter(REMEMBER_ME)
                 .and()
                 .logout()
                     .logoutUrl("/logout")
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
                     .clearAuthentication(true)
                     .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID", "remember-me")
+                    .deleteCookies("JSESSIONID", REMEMBER_ME)
                     .logoutSuccessUrl("/login");
     }
 
