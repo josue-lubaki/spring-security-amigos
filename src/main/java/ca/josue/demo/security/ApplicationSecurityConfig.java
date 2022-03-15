@@ -47,7 +47,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                     .usernameParameter("username") // correspond à l'attribut "username" du formulaire HTML
                 .and()
                 .rememberMe()
-                    .userDetailsService(userDetailsServiceBean())
+                    .userDetailsService(applicationUserService)
                     .key("remember-me")
                     .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
                     .key("somethingverysecured")
