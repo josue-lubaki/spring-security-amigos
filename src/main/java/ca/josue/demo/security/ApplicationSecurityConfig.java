@@ -1,6 +1,7 @@
 package ca.josue.demo.security;
 
 import ca.josue.demo.auth.ApplicationUserService;
+import ca.josue.demo.jwt.JwtTokenVerifier;
 import ca.josue.demo.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,10 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-                .antMatchers("/api/**").hasAnyRole(
-                        ApplicationUserRole.STUDENT.name(),
-                        ApplicationUserRole.ADMIN.name())
+                .antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
                 .anyRequest()
                 .authenticated();
     }

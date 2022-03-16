@@ -38,8 +38,11 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
         // Retrieve Authorization: Bearer yt3sg4hsu4...
         String authorizationHeader = request.getHeader("Authorization");
 
-        if(Strings.isNotEmpty(authorizationHeader) || authorizationHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request, response);
+        if (Strings.isEmpty(authorizationHeader) ||
+            Strings.isBlank(authorizationHeader) ||
+            !authorizationHeader.startsWith("Bearer ")){
+                filterChain.doFilter(request, response);
+                return;
         }
 
         // remove Bearer on Token
@@ -78,5 +81,8 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
         } catch (JwtException e) {
             throw new IllegalStateException(String.format("Token %s cannot be trusted", token));
         }
+
+        // pass to the next Filter
+        filterChain.doFilter(request, response);
     }
 }
