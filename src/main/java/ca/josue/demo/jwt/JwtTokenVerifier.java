@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,31 +31,38 @@ import java.util.stream.Collectors;
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
 
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
+
+    public JwtTokenVerifier(JwtConfig jwtConfig,
+                            SecretKey secretKey) {
+        this.jwtConfig = jwtConfig;
+        this.secretKey = secretKey;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         // Retrieve Authorization: Bearer yt3sg4hsu4...
-        String authorizationHeader = request.getHeader("Authorization");
+        String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeader());
 
         if (Strings.isEmpty(authorizationHeader) ||
             Strings.isBlank(authorizationHeader) ||
-            !authorizationHeader.startsWith("Bearer ")){
+            !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())){
                 filterChain.doFilter(request, response);
                 return;
         }
 
         // remove Bearer on Token
-        String token = authorizationHeader.replace("Bearer ", "");
+        String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
 
         try {
 
-            String secretKey = "securessecuressecuressecuressecuressecures";
-
             // build claims
             Jws<Claims> claimsJws = Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
 
